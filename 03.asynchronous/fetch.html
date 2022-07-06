@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+
+  <body>
+    <script>
+      async function getFBCTopPage() {
+        return await fetch('https://bootcamp.fjord.jp/')
+
+      }
+      getFBCTopPage()
+        .then(response => response.text())
+        .then(text => new DOMParser().parseFromString(text, 'text/html'))
+        .then(html => console.log(html))
+    </script>
+  </body>
+
+</html>
