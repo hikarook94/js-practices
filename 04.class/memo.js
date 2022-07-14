@@ -10,61 +10,78 @@ class MemoCommand {
 
   createMemo (input) {
     const _memos = this.memos
-    const header = input.split('\n')[0]
+    const firstLine = input.split('\n')[0]
     const newMemo = {
-      firstLine: header,
+      header: firstLine,
       content: input
     }
     _memos.push(newMemo)
-    fs.writeFileSync('./memos.json', JSON.stringify(_memos))
+    this.#writeFile(_memos)
   }
 
   showMemos () {
     this.memos.forEach(memo => {
-      console.log(memo.firstLine.trim())
+      console.log(memo.header.trim())
     })
   }
 
   refMemos () {
-    const prompt = new Select({
-      type: 'select',
-      message: 'Choose a note you want to see:',
-      choices: this.getChoices()
-    })
+    const message = 'Choose a note you want to see:'
+    const prompt = this.#getSelectPrompt(message)
     prompt.run()
       .then((answer) => {
-        console.log(this.memos.find(memo => memo.firstLine === answer).content)
+        console.log(this.memos.find(memo => memo.header === answer).content)
       })
   }
 
   deleteMemo () {
     const _memos = this.memos
-    const prompt = new Select({
-      type: 'select',
-      message: 'Choose a note you want to delete:',
-      choices: this.getChoices()
-    })
+    const message = 'Choose a note you want to delete:'
+    const prompt = this.#getSelectPrompt(message)
     prompt.run()
       .then((answer) => {
-        const _deletedMemos = _memos.filter(memo => memo.firstLine !== answer)
-        fs.writeFileSync('./memos.json', JSON.stringify(_deletedMemos))
+        const _deletedMemos = _memos.filter(memo => memo.header !== answer)
+        this.#writeFile(_deletedMemos)
       })
   }
 
-  getChoices () {
-    return this.memos.map(memo => ({ name: memo.firstLine }))
+  canSelect () {
+    return this.memos.length > 0
+  }
+
+  #getChoices () {
+    return this.memos.map(memo => ({ name: memo.header }))
+  }
+
+  #writeFile (memos) {
+    fs.writeFileSync('./memos.json', JSON.stringify(memos))
+  }
+
+  #getSelectPrompt (message) {
+    return new Select({
+      type: 'select',
+      choices: this.#getChoices(),
+      message
+    })
   }
 }
 
-const memoCommand = new MemoCommand()
-
-if (argv.l) {
-  memoCommand.showMemos()
-} else if (argv.r) {
-  memoCommand.refMemos()
-} else if (argv.d) {
-  memoCommand.deleteMemo()
-} else {
-  const input = fs.readFileSync('/dev/stdin', 'utf8')
-  memoCommand.createMemo(input)
+function main () {
+  const memoCommand = new MemoCommand()
+  if (argv.l) {
+    memoCommand.showMemos()
+  } else if (argv.r) {
+    if (memoCommand.canSelect()) {
+      memoCommand.refMemos()
+    }
+  } else if (argv.d) {
+    if (memoCommand.canSelect()) {
+      memoCommand.deleteMemo()
+    }
+  } else {
+    const input = fs.readFileSync('/dev/stdin', 'utf8')
+    memoCommand.createMemo(input)
+  }
 }
+
+main()
