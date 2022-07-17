@@ -10,14 +10,12 @@
 
   <body>
     <script>
-      async function getFBCTopPage() {
-        return await fetch('https://bootcamp.fjord.jp/')
-
+      async function getFBCTopPage () {
+        const response = await fetch('https://bootcamp.fjord.jp/')
+        const text = await response.text()
+        console.log(text);
       }
       getFBCTopPage()
-        .then(response => response.text())
-        .then(text => new DOMParser().parseFromString(text, 'text/html'))
-        .then(html => console.log(html))
     </script>
   </body>
 
