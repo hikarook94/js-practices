@@ -9,14 +9,14 @@ class MemoCommand {
   }
 
   createMemo (input) {
-    const _memos = this.memos
+    const memos = this.memos
     const firstLine = input.split('\n')[0]
     const newMemo = {
       header: firstLine,
       content: input
     }
-    _memos.push(newMemo)
-    this.#writeFile(_memos)
+    memos.push(newMemo)
+    this.#writeFile(memos)
   }
 
   showMemos () {
@@ -35,13 +35,13 @@ class MemoCommand {
   }
 
   deleteMemo () {
-    const _memos = this.memos
+    const memos = this.memos
     const message = 'Choose a note you want to delete:'
     const prompt = this.#getSelectPrompt(message)
     prompt.run()
       .then((answer) => {
-        const _deletedMemos = _memos.filter(memo => memo.header !== answer)
-        this.#writeFile(_deletedMemos)
+        const filteredMemos = memos.filter(memo => memo.header !== answer)
+        this.#writeFile(filteredMemos)
       })
   }
 
